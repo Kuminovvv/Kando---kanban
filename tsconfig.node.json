@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noEmit": true,
+    "target": "ESNext", // Определяем целевой уровень ECMAScript
+    "lib": ["ESNext", "DOM"], // Добавляем библиотеки для ESNext и DOM
+    "esModuleInterop": true, // Включаем совместимость с CommonJS модулями
+    "resolveJsonModule": true // Разрешаем импорт JSON файлов
+  },
+  "include": ["vite.config.ts"]
+}

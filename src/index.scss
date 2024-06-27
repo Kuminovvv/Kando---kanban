@@ -1,0 +1,18 @@
+@use "./_color.scss";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  color: color.$dark !important;
+}
+.Button,.TextField-InputContainer_view_default {
+    border-radius: .7rem;
+}
+.TextField-InputContainer_view_default.TextField-InputContainer_disabled{
+  background-color: #00000000;
+  color: color.$dark!important;
+}
+.TextField-Input{
+  color: color.$dark!important;
+}
