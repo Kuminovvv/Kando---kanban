@@ -8,12 +8,10 @@ import { IconAdd } from '@consta/icons/IconAdd';
 import { TextFieldPropValue } from '@consta/uikit/TextField';
 import { onDragEnd } from "../../../entities/helper";
 
-interface Interface {
-    data: ColumnsFromBackend
-}
 
-export const DropAndDrag = ({ data }: Interface) => {
-    const [columns, setColumns] = useLocalStorage<ColumnsFromBackend>('drop-and-drag', data);
+export const DropAndDrag = () => {
+    const [columns, setColumns] = useLocalStorage<ColumnsFromBackend>('drop-and-drag', {} as ColumnsFromBackend);
+
 
     const updateColumnTitle = (columnId: string, newTitle: TextFieldPropValue) => {
         const updatedColumns = {
@@ -39,7 +37,13 @@ export const DropAndDrag = ({ data }: Interface) => {
                 ...columns[columnId],
                 items: [
                     ...columns[columnId].items,
-                    { id: Date.now().toString(), name: 'Новая карточка' }
+                    {
+                        id: Date.now().toString(),
+                        name: 'Новая карточка',
+                        color: "red",
+                        date: new Date(),
+                        description: "",
+                    }
                 ],
             },
         };

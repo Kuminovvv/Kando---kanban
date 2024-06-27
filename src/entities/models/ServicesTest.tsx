@@ -21,37 +21,4 @@ export const columnsFromAbit: ColumnsFromBackend = {
             },
         ]
     },
-    ['secondColumn']: {
-        title: 'Сервисы',
-        items: [
-            {
-                id: 'distdocs',
-                name: 'Электронная подача документов в вуз',
-                description: 'Возможность подать документы онлайн',
-                date:'12.02.2024',
-                color: 'red'
-
-            },
-            {
-                id: 'omsu',
-                name: 'Официальный сайт ОмГУ',
-                description: 'Основной сайт Омского государственного университета',
-                date:'12.02.2024',
-                color: 'red'
-            },
-
-        ]
-    },
-    ['thirdColumn']: {
-        title: 'Сервисы',
-        items: [
-            {
-                id: 'positionege',
-                name: 'Калькулятор ЕГЭ',
-                description: 'Инструмент для расчета баллов ЕГЭ',
-                date:'12.02.2024',
-                color: 'red'
-            },
-        ]
-    },
 };

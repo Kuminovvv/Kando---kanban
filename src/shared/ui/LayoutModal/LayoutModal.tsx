@@ -6,6 +6,7 @@ import { useLocalStorage } from 'usehooks-ts';
 import { ColumnsFromBackend } from '../../../entities/models/columnsFromBackend';
 import { cnMixSpace } from '@consta/uikit/MixSpace';
 import { TextField } from '@consta/uikit/__internal__/src/components/TextField';
+import { IconAdd } from '@consta/icons/IconAdd';
 
 
 export const LayoutModal = () => {
@@ -32,8 +33,9 @@ export const LayoutModal = () => {
             <Button
                 size="m"
                 view="primary"
-                label="Открыть модальное окно"
+                label="Добавить"
                 width="default"
+                iconLeft={IconAdd}
                 onClick={() => setIsModalOpen(true)}
             />
             <Modal

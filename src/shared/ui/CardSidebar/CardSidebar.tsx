@@ -134,15 +134,20 @@ export const CardSidebar = ({ item, columnId }: CardSidebarProps) => {
                             value={description}
                             type="textarea"
                             cols={200}
-                            rows={3}
+                            rows={5}
                             placeholder="Описание"
                             onClick={() => console.log('click')}
                             disabled={!editableFields.description}
                         />
                         {renderEditButton('description')}
                     </div>
-                    <DatePicker value={date} onChange={handleChangeDate} />
-                    <HexColorPicker color={color} onChange={handleChangeColor} />
+                    <DatePicker label="Дата завершения" value={date} onChange={handleChangeDate} />
+                    <div className="card-sidebar__color">
+                        <TextField label="Цвет" value={color} onChange={handleChangeColor} />
+                        <br />
+                        <br />
+                        <HexColorPicker color={color} onChange={handleChangeColor} />
+                    </div>
                 </Sidebar.Content>
             </Sidebar>
         </>

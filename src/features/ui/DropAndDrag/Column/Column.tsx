@@ -39,18 +39,24 @@ export const Column = ({ columnId, column, updateColumnTitle, deleteColumn, addC
     return (
         <div className="drop-and-drag__column" key={columnId}>
             <div className="drop-and-drag__column-title">
-                <h2>
-                    <TextField
-                        onChange={(value) => handleChange(value)}
-                        value={title}
-                        type="text"
-                        placeholder="Одна строчка"
-                        disabled={!isEdit}
-                    />
+                <h2 className="drop-and-drag__column-title-text">
+                    {
+                        isEdit ? (
+                            <TextField
+                                onChange={(value) => handleChange(value)}
+                                value={title}
+                                type="text"
+                                placeholder="Одна строчка"
+                                disabled={!isEdit}
+                            />
+                        ) : title
+                    }
                 </h2>
-                <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={handleEdit} />
-                <Button label="Удалить" view="clear" iconRight={IconTrash} onlyIcon onClick={handleDelete} />
-                <Button label="Добавить карточку" view="clear" iconRight={IconAdd} onlyIcon onClick={handleAddCard} />
+                <div className="drop-and-drag__column-buttons">
+                    <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={handleEdit} />
+                    <Button label="Удалить" view="clear" iconRight={IconTrash} onlyIcon onClick={handleDelete} />
+                    <Button label="Добавить карточку" view="clear" iconRight={IconAdd} onlyIcon onClick={handleAddCard} />
+               </div>
             </div>
             <Droppable droppableId={columnId} key={columnId}>
                 {(provided, snapshot) => (
