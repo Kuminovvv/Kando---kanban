@@ -1,6 +1,6 @@
 import { Button } from "@consta/uikit/Button";
 import { Sidebar } from '@consta/uikit/Sidebar';
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Item } from "../../../entities/models/item";
 import './CardSidebar.scss';
 import { TextField, TextFieldPropValue } from "@consta/uikit/TextField";
@@ -9,60 +9,81 @@ import { IconCheck } from "@consta/icons/IconCheck";
 import { DatePicker, DatePickerPropValue } from '@consta/uikit/DatePicker';
 import { HexColorPicker } from "react-colorful";
 import { useLocalStorage } from "usehooks-ts";
-import { ColumnsFromBackend } from "../../../entities/models/columnsFromBackend";
 import { IconTrash } from "@consta/icons/IconTrash";
+import { Checkbox } from "@consta/uikit/Checkbox";
+import { IColumnsFromBackend } from "../../../entities/models/columnsFromBackend";
 
 interface CardSidebarProps {
     item: Item;
     columnId: string;
+    isSidebarOpen: boolean;
+    onClickOutside: () => void;
 }
 
-export const CardSidebar = ({ item, columnId }: CardSidebarProps) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [date, setDate] = useState<DatePickerPropValue<"date">>(new Date(item.date));
+export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: CardSidebarProps) => {
+    const [checked, setChecked] = useState<boolean>(item.isClosed);
+    const [date, setDate] = useState<DatePickerPropValue<"date">>(new Date(item.date ?? new Date()));
     const [name, setName] = useState<TextFieldPropValue | string>(item.name);
     const [description, setDescription] = useState<TextFieldPropValue | string>(item.description);
     const [color, setColor] = useState<string>(item.color);
-    const [columns, setColumns] = useLocalStorage<ColumnsFromBackend>('drop-and-drag', {} as ColumnsFromBackend);
+    const [columns, setColumns] = useLocalStorage<IColumnsFromBackend>('drop-and-drag', {} as IColumnsFromBackend);
 
-    const [editableFields, setEditableFields] = useState<{
-        name: boolean;
-        description: boolean;
-    }>({
+    const [editableFields, setEditableFields] = useState<{ name: boolean; description: boolean }>({
         name: false,
         description: false,
     });
 
-    const handleChangeName = (value: TextFieldPropValue | string) => {
-        setName(value);
-        saveChanges({ ...item, name: value });
-    };
+    useEffect(() => {
+        if (item.date) {
+            setChecked(new Date(item.date) < new Date());
+        }else{
+            setChecked(item.isClosed);
+        }
+    }, [item.date, item.isClosed]);
 
-    const handleChangeDescription = (value: TextFieldPropValue) => {
-        setDescription(value);
-        saveChanges({ ...item, description: value });
-    };
+    const saveChanges = useCallback(
+        (updatedItem: Item) => {
+            const updatedColumns = {
+                ...columns,
+                [columnId]: {
+                    ...columns[columnId],
+                    items: columns[columnId].items.map(i => (i.id === updatedItem.id ? updatedItem : i)),
+                },
+            };
+            setColumns(updatedColumns);
+        },
+        [columns, columnId, setColumns]
+    );
 
-    const handleChangeDate = (value: DatePickerPropValue<"date">) => {
-        setDate(value);
-        saveChanges({ ...item, date: value });
-    };
-
-    const handleChangeColor = (value: string) => {
-        setColor(value);
-        saveChanges({ ...item, color: value });
-    };
-
-    const saveChanges = (updatedItem: Item) => {
-        const updatedColumns = {
-            ...columns,
-            [columnId]: {
-                ...columns[columnId],
-                items: columns[columnId].items.map(i => i.id === updatedItem.id ? updatedItem : i),
-            },
-        };
-        setColumns(updatedColumns);
-    };
+    const handleChange = useCallback(
+        (field: keyof Item, value: any) => {
+            if (field === 'color' && (!value || value === "")) {
+                value = "green";
+            }
+            const updatedItem = { ...item, [field]: value };
+            switch (field) {
+                case 'name':
+                    setName(value);
+                    break;
+                case 'description':
+                    setDescription(value);
+                    break;
+                case 'isClosed':
+                    setChecked(value);
+                    break;
+                case 'date':
+                    setDate(value);
+                    break;
+                case 'color':
+                    setColor(value);
+                    break;
+                default:
+                    break;
+            }
+            saveChanges(updatedItem);
+        },
+        [item, saveChanges]
+    );
 
     const deleteItem = () => {
         const updatedColumns = {
@@ -73,37 +94,32 @@ export const CardSidebar = ({ item, columnId }: CardSidebarProps) => {
             },
         };
         setColumns(updatedColumns);
-        setIsSidebarOpen(false);
+        onClickOutside();
     };
 
-    const toggleEditField = (field: string) => () => {
-        setEditableFields(prevEditableFields => ({
-            ...prevEditableFields,
-            [field]: !prevEditableFields[field],
-        }));
-    };
+    const toggleEditField = useCallback(
+        (field: keyof typeof editableFields) => () => {
+            setEditableFields(prevEditableFields => ({
+                ...prevEditableFields,
+                [field]: !prevEditableFields[field],
+            }));
+        },
+        []
+    );
 
-    const renderEditButton = (field: string) => {
-        return editableFields[field] ? (
-            <Button label="Сохранить" view="clear" iconRight={IconCheck} onlyIcon onClick={toggleEditField(field)} />
-        ) : (
-            <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={toggleEditField(field)} />
-        );
-    };
-
-    const onClickOutside = () => {
-        setIsSidebarOpen(false);
-    };
+    const renderEditButton = (field: keyof typeof editableFields) => (
+        <Button
+            label={editableFields[field] ? "Сохранить" : "Редактировать"}
+            view="clear"
+            iconRight={editableFields[field] ? IconCheck : IconEdit}
+            onlyIcon
+            onClick={toggleEditField(field)}
+        />
+    );
 
     return (
         <>
-            <Button
-                size="m"
-                view="clear"
-                label={name}
-                width="default"
-                onClick={() => setIsSidebarOpen(true)}
-            />
+            <span style={{ textDecoration: checked ? 'line-through' : 'none' }}>{name}</span>
             <Sidebar
                 hasOverlay={false}
                 size='1/3'
@@ -120,7 +136,7 @@ export const CardSidebar = ({ item, columnId }: CardSidebarProps) => {
                     />
                     <div className="card-sidebar__input">
                         <TextField
-                            onChange={handleChangeName}
+                            onChange={(value) => handleChange('name', value)}
                             value={name}
                             type="text"
                             placeholder="Одна строчка"
@@ -128,25 +144,40 @@ export const CardSidebar = ({ item, columnId }: CardSidebarProps) => {
                         />
                         {renderEditButton('name')}
                     </div>
-                    <div className="card-sidebar__input" >
+                    <Checkbox
+                        label="Чекбокс"
+                        size="m"
+                        view="primary"
+                        checked={checked}
+                        align="center"
+                        disabled={false}
+                        onChange={(checked ) => handleChange('isClosed', checked.target.checked)}
+                    />
+                    <div className="card-sidebar__input">
                         <TextField
-                            onChange={handleChangeDescription}
+                            onChange={(value) => handleChange('description', value)}
                             value={description}
                             type="textarea"
                             cols={200}
                             rows={5}
                             placeholder="Описание"
-                            onClick={() => console.log('click')}
                             disabled={!editableFields.description}
                         />
                         {renderEditButton('description')}
                     </div>
-                    <DatePicker label="Дата завершения" value={date} onChange={handleChangeDate} />
+                    <DatePicker
+                        label="Дата завершения"
+                        value={date}
+                        onChange={(value) => handleChange('date', value)}
+                    />
                     <div className="card-sidebar__color">
-                        <TextField label="Цвет" value={color} onChange={handleChangeColor} />
-                        <br />
-                        <br />
-                        <HexColorPicker color={color} onChange={handleChangeColor} />
+                        <Button label="Зеленый" style={{ backgroundColor: '#55C776' }} onClick={() => handleChange('color', '#55C776')}/>
+                        <Button label="Желтый" style={{ backgroundColor: '#F9D229' }} onClick={() => handleChange('color', '#F9D229')}/>
+                        <Button label="Красный" style={{ backgroundColor: '#E62520' }} onClick={() => handleChange('color', '#E62520')}/>
+                        <HexColorPicker
+                            color={color}
+                            onChange={(value) => handleChange('color', value)}
+                        />
                     </div>
                 </Sidebar.Content>
             </Sidebar>

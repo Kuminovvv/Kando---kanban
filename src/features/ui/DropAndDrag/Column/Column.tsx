@@ -1,4 +1,3 @@
-// Column.tsx
 import { Droppable } from "react-beautiful-dnd";
 import { DraggableItem } from "../DraggableItem/DraggableItem";
 import { TColumn } from "../../../../entities/models/TColumn";
@@ -8,14 +7,13 @@ import { IconTrash } from '@consta/icons/IconTrash';
 import { IconAdd } from '@consta/icons/IconAdd';
 import { useState } from "react";
 import { TextField, TextFieldPropValue } from "@consta/uikit/TextField";
-// Column.tsx
 
 interface ColumnProps {
     columnId: string;
     column: TColumn;
     updateColumnTitle: (columnId: string, newTitle: TextFieldPropValue) => void;
     deleteColumn: (columnId: string) => void;
-    addCard: (columnId: string) => void; // Добавляем новый пропс
+    addCard: (columnId: string) => void;
 }
 
 export const Column = ({ columnId, column, updateColumnTitle, deleteColumn, addCard }: ColumnProps) => {
@@ -29,41 +27,32 @@ export const Column = ({ columnId, column, updateColumnTitle, deleteColumn, addC
         }
         setIsEdit(prev => !prev);
     };
-    const handleDelete = () => {
-        deleteColumn(columnId);
-    };
-    const handleAddCard = () => {
-        addCard(columnId); // Добавление карточки с предопределённым содержанием
-    };
 
     return (
-        <div className="drop-and-drag__column" key={columnId}>
-            <div className="drop-and-drag__column-title">
-                <h2 className="drop-and-drag__column-title-text">
-                    {
-                        isEdit ? (
-                            <TextField
-                                onChange={(value) => handleChange(value)}
-                                value={title}
-                                type="text"
-                                placeholder="Одна строчка"
-                                disabled={!isEdit}
-                            />
-                        ) : title
-                    }
+        <div className="drop-and-drag__column">
+            <div className="drop-and-drag__column-header">
+                <h2 className="drop-and-drag__column-title">
+                    {isEdit ? (
+                        <TextField
+                            onChange={handleChange}
+                            value={title}
+                            type="text"
+                            placeholder="Одна строчка"
+                        />
+                    ) : title}
                 </h2>
-                <div className="drop-and-drag__column-buttons">
+                <div className="drop-and-drag__column-actions">
                     <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={handleEdit} />
-                    <Button label="Удалить" view="clear" iconRight={IconTrash} onlyIcon onClick={handleDelete} />
-                    <Button label="Добавить карточку" view="clear" iconRight={IconAdd} onlyIcon onClick={handleAddCard} />
-               </div>
+                    <Button label="Удалить" view="clear" iconRight={IconTrash} onlyIcon onClick={() => deleteColumn(columnId)} />
+                    <Button label="Добавить карточку" view="clear" iconRight={IconAdd} onlyIcon onClick={() => addCard(columnId)} />
+                </div>
             </div>
             <Droppable droppableId={columnId} key={columnId}>
                 {(provided, snapshot) => (
                     <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="drop-and-drag__column-inner"
+                        className="drop-and-drag__column-content"
                         style={{
                             background: snapshot.isDraggingOver ? "lightblue" : "",
                         }}
@@ -77,4 +66,4 @@ export const Column = ({ columnId, column, updateColumnTitle, deleteColumn, addC
             </Droppable>
         </div>
     );
-}
+};

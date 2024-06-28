@@ -2,52 +2,58 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useLocalStorage } from "usehooks-ts";
 import './DropAndDrag.scss';
 import { Column } from "./Column/Column";
-import { ColumnsFromBackend } from "../../../entities/models/columnsFromBackend";
 import { Button } from '@consta/uikit/Button';
 import { IconAdd } from '@consta/icons/IconAdd';
 import { TextFieldPropValue } from '@consta/uikit/TextField';
 import { onDragEnd } from "../../../entities/helper";
-
+import { v4 as uuidv4 } from 'uuid';
+import { IColumnsFromBackend } from "../../../entities/models/columnsFromBackend";
 
 export const DropAndDrag = () => {
-    const [columns, setColumns] = useLocalStorage<ColumnsFromBackend>('drop-and-drag', {} as ColumnsFromBackend);
-
+    const [columns, setColumns] = useLocalStorage<IColumnsFromBackend>('drop-and-drag', {} as IColumnsFromBackend);
 
     const updateColumnTitle = (columnId: string, newTitle: TextFieldPropValue) => {
-        const updatedColumns = {
-            ...columns,
+        setColumns(prevColumns => ({
+            ...prevColumns,
             [columnId]: {
-                ...columns[columnId],
+                ...prevColumns[columnId],
                 title: newTitle,
             },
-        };
-        setColumns(updatedColumns);
+        }));
     };
 
     const deleteColumn = (columnId: string) => {
-        const updatedColumns = { ...columns };
-        delete updatedColumns[columnId];
-        setColumns(updatedColumns);
+        setColumns(prevColumns => {
+            const updatedColumns = { ...prevColumns };
+            delete updatedColumns[columnId];
+            return updatedColumns;
+        });
     };
 
     const addCard = (columnId: string) => {
-        const updatedColumns = {
-            ...columns,
-            [columnId]: {
-                ...columns[columnId],
-                items: [
-                    ...columns[columnId].items,
-                    {
-                        id: Date.now().toString(),
-                        name: 'Новая карточка',
-                        color: "red",
-                        date: new Date(),
-                        description: "",
-                    }
-                ],
-            },
+        const newCard = {
+            id: Date.now().toString(),
+            name: 'Новая карточка',
+            color: "red",
+            description: "",
+            isClosed: false,
         };
-        setColumns(updatedColumns);
+        setColumns((prevColumns: IColumnsFromBackend) => ({
+            ...prevColumns,
+            [columnId]: {
+                ...prevColumns[columnId],
+                items: [...prevColumns[columnId].items, newCard],
+            },
+        }));
+    };
+
+    const addColumn = () => {
+        const newColumnId = uuidv4();
+        const newColumn = { title: 'Новая колонка', items: [] };
+        setColumns(prevColumns => ({
+            ...prevColumns,
+            [newColumnId]: newColumn,
+        }));
     };
 
     return (
@@ -88,11 +94,9 @@ export const DropAndDrag = () => {
             <Button
                 label="Добавить новую колонку"
                 view="clear"
-                onClick={() => {
-                    setColumns({ ...columns, [Date.now().toString()]: { title: 'Новая колонка', items: [] } });
-                }}
+                onClick={addColumn}
                 iconLeft={IconAdd}
             />
         </div>
     );
-}
+};

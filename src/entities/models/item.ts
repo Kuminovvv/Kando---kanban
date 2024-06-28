@@ -8,6 +8,7 @@ export interface IItem {
     description: string | TextFieldPropValue;
     date: Date | TextFieldPropValue;
     color: string;
+    isClosed: boolean;
 
 }
 
@@ -17,6 +18,7 @@ export class Item implements IItem {
     description: string | TextFieldPropValue;
     date: Date | TextFieldPropValue;
     color: string;
+    isClosed: boolean;
    
 
     constructor(obj: IItem) {
@@ -25,6 +27,7 @@ export class Item implements IItem {
         this.description = obj.description
         this.date = obj.date
         this.color = obj.color
+        this.isClosed = obj.isClosed
 
     }
 }
