@@ -94,7 +94,7 @@ export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: C
             },
         };
         setColumns(updatedColumns);
-        onClickOutside();
+        onClickOutside(false);
     };
 
     const toggleEditField = useCallback(
@@ -122,7 +122,7 @@ export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: C
             <span style={{ textDecoration: checked ? 'line-through' : 'none' }}>{name}</span>
             <Sidebar
                 hasOverlay={false}
-                size='1/3'
+                size='1/2'
                 isOpen={isSidebarOpen}
                 onClickOutside={onClickOutside}
                 onEsc={onClickOutside}
@@ -139,7 +139,8 @@ export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: C
                             onChange={(value) => handleChange('name', value)}
                             value={name}
                             type="text"
-                            placeholder="Одна строчка"
+                            maxLength={255}
+                            placeholder="Заголовок"
                             disabled={!editableFields.name}
                         />
                         {renderEditButton('name')}
@@ -159,6 +160,7 @@ export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: C
                             value={description}
                             type="textarea"
                             cols={200}
+                            maxLength={1024}
                             rows={5}
                             placeholder="Описание"
                             disabled={!editableFields.description}
@@ -179,6 +181,7 @@ export const CardSidebar = ({ item, columnId, isSidebarOpen, onClickOutside }: C
                             onChange={(value) => handleChange('color', value)}
                         />
                     </div>
+                    
                 </Sidebar.Content>
             </Sidebar>
         </>

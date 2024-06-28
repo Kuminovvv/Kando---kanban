@@ -91,11 +91,13 @@ export const ModalAddTask = () => {
                         type="text"
                         placeholder="Название колонки"
                         value={columnValue}
+                        maxLength={255}
                         items={columnTitles}
                         onChange={(value) => setColumnValue(value)}
                         getItemKey={(item: { label: string; value: string }) => item.value}
                     />
                     <TextField
+                        maxLength={255}
                         onChange={(value) => handleChange(value)}
                         value={cardTitle}
                         type="text"

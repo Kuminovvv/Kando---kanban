@@ -5,6 +5,7 @@ import { Button } from "@consta/uikit/Button";
 import { IconEdit } from '@consta/icons/IconEdit';
 import { IconTrash } from '@consta/icons/IconTrash';
 import { IconAdd } from '@consta/icons/IconAdd';
+import { IconCheck } from '@consta/icons/IconCheck';
 import { useState } from "react";
 import { TextField, TextFieldPropValue } from "@consta/uikit/TextField";
 
@@ -42,7 +43,13 @@ export const Column = ({ columnId, column, updateColumnTitle, deleteColumn, addC
                     ) : title}
                 </h2>
                 <div className="drop-and-drag__column-actions">
-                    <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={handleEdit} />
+                    {
+                        isEdit ? (
+                            <Button label="Сохранить" view="clear" iconRight={IconCheck} onlyIcon onClick={handleEdit} />
+                        ) : (
+                            <Button label="Редактировать" view="clear" iconRight={IconEdit} onlyIcon onClick={handleEdit} />
+                        )
+                    }
                     <Button label="Удалить" view="clear" iconRight={IconTrash} onlyIcon onClick={() => deleteColumn(columnId)} />
                     <Button label="Добавить карточку" view="clear" iconRight={IconAdd} onlyIcon onClick={() => addCard(columnId)} />
                 </div>
